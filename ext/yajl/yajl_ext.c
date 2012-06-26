@@ -54,27 +54,31 @@ inline void yajl_check_and_fire_callback(void * ctx) {
 
     if (len > 0) {
         VALUE level = INT2FIX(wrapper->nestedArrayLevel + wrapper->nestedHashLevel);
-        VALUE object;
+		VALUE container = wrapper->builderStack;
+        VALUE object, callback_result;
         switch (wrapper->event) {
         case YPE_FOUND_HASH_KEY:
             if (wrapper->hash_key_found_callback != Qnil) {
-                object = rb_ary_last(0, NULL, wrapper->builderStack);
+                object = rb_ary_entry(wrapper->builderStack, -1);
                 rb_funcall(wrapper->hash_key_found_callback, intern_call, 2,  object, level);
             }
             break;
         case YPE_FOUND_END_ARRAY:
             if (wrapper->end_array_found_callback != Qnil) {
-                object = rb_ary_last(0, NULL, wrapper->builderStack);
+                object = rb_ary_entry(wrapper->builderStack, -1);
                 rb_funcall(wrapper->end_array_found_callback, intern_call, 2,  object, level);
             }
             break;
         case YPE_FOUND_END_HASH:
             if (wrapper->end_hash_found_callback != Qnil) {
-                object = rb_ary_last(0, NULL, wrapper->builderStack);
+                object = rb_ary_entry(0, NULL, wrapper->builderStack);
                 if (TYPE(object) == T_ARRAY) {
-                    object = rb_ary_last(0, NULL, object);
+					container = object;
+                    object = rb_ary_entry(object, -1);
                 }
-                rb_funcall(wrapper->end_hash_found_callback, intern_call, 2,  object, level);
+                callback_result = rb_funcall(wrapper->end_hash_found_callback, intern_call, 2,  object, level);
+				if (callback_result == sym_dispose)
+					rb_ary_pop(container);
             }
             break;
         }
@@ -953,6 +957,7 @@ void Init_yajl() {
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
+	sym_dispose = ID2SYM(rb_intern("dispose"));
 
 #ifdef HAVE_RUBY_ENCODING_H
     utf8Encoding = rb_utf8_encoding();
