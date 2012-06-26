@@ -31,4 +31,28 @@ describe "Partial parser" do
 
     toys.should eql(%w(buzz rex bo hamm))
   end
+
+  it "should remove hash from array if on_hash_end callback returns :dispose" do
+    toys = []
+
+    @parser.on_hash_end = lambda do |hash, level|
+      toys.push hash["id"]
+      :dispose
+    end
+
+
+    @parser.on_parse_complete = lambda do |obj|
+      obj.should eql([])
+    end
+
+    @parser << '['
+    @parser << '  {"id": "buzz"},'
+    @parser << '  {"id": "rex"},'
+    @parser << '  {"id": "bo"},'
+    @parser << '  {"id": "hamm"}'
+    @parser << ']'
+
+    toys.should eql(%w(buzz rex bo hamm))
+  end
 end
+
