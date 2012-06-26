@@ -71,7 +71,7 @@ inline void yajl_check_and_fire_callback(void * ctx) {
             break;
         case YPE_FOUND_END_HASH:
             if (wrapper->end_hash_found_callback != Qnil) {
-                object = rb_ary_entry(0, NULL, wrapper->builderStack);
+                object = rb_ary_entry(wrapper->builderStack, -1);
                 if (TYPE(object) == T_ARRAY) {
 					container = object;
                     object = rb_ary_entry(object, -1);
