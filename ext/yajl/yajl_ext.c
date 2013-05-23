@@ -33,7 +33,7 @@
  return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
 
 /* Helpers for building objects */
-inline void yajl_check_and_fire_callback(void * ctx) {
+static inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
 
@@ -85,7 +85,7 @@ inline void yajl_check_and_fire_callback(void * ctx) {
     }
 }
 
-inline void yajl_set_static_value(void * ctx, VALUE val) {
+static inline void yajl_set_static_value(void * ctx, VALUE val) {
     yajl_parser_wrapper * wrapper;
     VALUE lastEntry, hash;
     int len;
