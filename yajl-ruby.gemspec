@@ -1,7 +1,7 @@
 require './lib/yajl/version'
 
 Gem::Specification.new do |s|
-  s.name = %q{yajl-ruby}
+  s.name = %q{timon-yajl-ruby}
   s.version = Yajl::VERSION
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
   s.date = Time.now.utc.strftime("%Y-%m-%d")
